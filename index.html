@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>亲密关系NPD倾向测评</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f4f0;
+  --bg-card: #ffffff;
+  --bg-dark: #1a1a1e;
+  --border: #e2ddd6;
+  --border-light: #eae6e0;
+  --text-dark: #1a1a1e;
+  --text-body: #3a3a3c;
+  --text-muted: #8a8580;
+  --accent: #c23c2a;
+  --accent-light: rgba(194,60,42,0.08);
+  --clinical: #2a6b5a;
+  --clinical-light: rgba(42,107,90,0.08);
+  --warm: #b8860b;
+  --warm-light: rgba(184,134,11,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Noto Sans SC',sans-serif; background:var(--bg); color:var(--text-body); min-height:100vh; -webkit-font-smoothing:antialiased; }
+.container { max-width:520px; margin:0 auto; padding:0 20px; }
+.screen { display:none; }
+.screen.active { display:block; animation:fadeIn 0.5s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+.intro-header { padding:56px 0 36px; border-bottom:1px solid var(--border); }
+.intro-header .edition { font-family:'Playfair Display',serif; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted); margin-bottom:28px; }
+.intro-header h1 { font-family:'Noto Serif SC',serif; font-size:28px; font-weight:900; line-height:1.4; color:var(--text-dark); margin-bottom:12px; }
+.intro-header .en-title { font-family:'Playfair Display',serif; font-size:13px; font-style:italic; color:var(--text-muted); letter-spacing:1px; }
+.intro-body { padding:28px 0; }
+.intro-body .ref-tag { display:inline-block; font-size:11px; font-weight:500; letter-spacing:1px; color:var(--clinical); background:var(--clinical-light); padding:5px 12px; border-radius:4px; margin-bottom:18px; }
+.intro-body .desc { font-size:15px; line-height:2; color:var(--text-body); margin-bottom:24px; }
+.methodology { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:24px; }
+.methodology h3 { font-size:13px; font-weight:700; color:var(--text-dark); margin-bottom:12px; letter-spacing:1px; }
+.dimension-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.dim-chip { font-size:12px; color:var(--text-muted); background:var(--bg); padding:6px 0; border-radius:4px; text-align:center; }
+.how-section { margin-bottom:24px; }
+.how-section h3 { font-family:'Noto Serif SC',serif; font-size:15px; font-weight:700; color:var(--text-dark); margin-bottom:12px; }
+.how-section p { font-size:13px; line-height:1.9; color:var(--text-muted); }
+.disclaimer { font-size:12px; line-height:1.8; color:var(--text-muted); padding:16px; border-left:2px solid var(--accent); background:var(--accent-light); border-radius:0 6px 6px 0; margin-bottom:32px; }
+.btn-primary { display:block; width:100%; background:var(--text-dark); color:#fff; border:none; border-radius:8px; padding:16px; font-size:15px; font-weight:500; cursor:pointer; transition:all 0.3s; font-family:'Noto Sans SC'; letter-spacing:1px; }
+.btn-primary:hover { background:#2d2d32; transform:translateY(-1px); }
+.btn-primary:active { transform:scale(0.99); }
+.intro-footer { padding:20px 0 40px; text-align:center; font-size:11px; color:var(--text-muted); }
+
+.quiz-top { position:sticky; top:0; background:var(--bg); z-index:10; padding:16px 0 12px; border-bottom:1px solid var(--border-light); }
+.quiz-progress-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.quiz-progress-row .qcount { font-family:'Playfair Display',serif; font-size:14px; color:var(--text-dark); font-weight:700; }
+.quiz-progress-row .layer-label { font-size:11px; font-weight:500; padding:3px 10px; border-radius:100px; }
+.layer-1 { color:var(--clinical); background:var(--clinical-light); }
+.layer-2 { color:var(--warm); background:var(--warm-light); }
+.layer-3 { color:var(--accent); background:var(--accent-light); }
+.quiz-bar { height:2px; background:var(--border); border-radius:10px; overflow:hidden; }
+.quiz-bar-fill { height:100%; background:var(--text-dark); transition:width 0.5s ease; }
+.quiz-question { padding:36px 0 24px; }
+.quiz-question h2 { font-family:'Noto Serif SC',serif; font-size:18px; font-weight:600; line-height:1.7; color:var(--text-dark); }
+.likert-wrap { padding-bottom:40px; }
+.likert-labels { display:flex; justify-content:space-between; margin-bottom:16px; font-size:12px; color:var(--text-muted); }
+.likert-options { display:flex; gap:10px; margin-bottom:12px; }
+.likert-btn { flex:1; aspect-ratio:1; max-width:72px; background:var(--bg-card); border:1.5px solid var(--border); border-radius:12px; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--text-muted); }
+.likert-btn:hover { border-color:var(--text-dark); color:var(--text-dark); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+.likert-btn.selected { background:var(--text-dark); border-color:var(--text-dark); color:#fff; transform:scale(1.05); }
+.likert-hint { display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); opacity:0.7; }
+
+.result-header { padding:48px 0 28px; text-align:center; border-bottom:1px solid var(--border); }
+.result-header .r-label { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted); margin-bottom:20px; }
+.score-display { margin-bottom:8px; }
+.score-big { font-family:'Playfair Display',serif; font-size:72px; font-weight:700; color:var(--text-dark); line-height:1; }
+.score-total { font-family:'Playfair Display',serif; font-size:20px; color:var(--text-muted); }
+.score-level { display:inline-block; font-size:13px; font-weight:600; padding:6px 20px; border-radius:100px; margin-top:12px; }
+.level-low { background:#e8f5e9; color:#2e7d32; }
+.level-mid { background:#fff8e1; color:#f57f17; }
+.level-high { background:#fce4ec; color:#c62828; }
+.level-extreme { background:#c62828; color:#fff; }
+
+.verdict-section { padding:28px 0; border-bottom:1px solid var(--border); text-align:center; }
+.verdict-text { font-family:'Noto Serif SC',serif; font-size:17px; font-weight:700; line-height:1.8; color:var(--text-dark); padding:20px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; position:relative; }
+.verdict-text::before { content:'\201C'; position:absolute; top:8px; left:14px; font-family:'Playfair Display',serif; font-size:36px; color:var(--border); line-height:1; }
+
+.radar-section { padding:28px 0; border-bottom:1px solid var(--border); }
+.section-title { font-family:'Noto Serif SC',serif; font-size:16px; font-weight:700; color:var(--text-dark); margin-bottom:24px; display:flex; align-items:center; gap:8px; }
+.section-title::before { content:''; display:inline-block; width:3px; height:16px; background:var(--accent); border-radius:2px; }
+.radar-canvas-wrap { display:flex; justify-content:center; margin-bottom:8px; }
+
+.dim-section { padding:28px 0; border-bottom:1px solid var(--border); }
+.dim-row { display:flex; align-items:center; padding:14px 0; border-bottom:1px solid var(--border-light); }
+.dim-row:last-child { border-bottom:none; }
+.dim-rank { font-family:'Playfair Display',serif; font-size:14px; font-weight:700; color:var(--text-muted); width:28px; flex-shrink:0; }
+.dim-info { flex:1; }
+.dim-name { font-size:14px; font-weight:600; color:var(--text-dark); margin-bottom:4px; }
+.dim-sub { font-size:11px; color:var(--text-muted); }
+.dim-score { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; width:48px; text-align:right; flex-shrink:0; }
+.dim-bar-wrap { width:80px; margin-left:12px; flex-shrink:0; }
+.dim-bar-bg { height:4px; background:var(--border); border-radius:10px; overflow:hidden; }
+.dim-bar-fill { height:100%; border-radius:10px; transition:width 1s ease; }
+.fill-low { background:var(--clinical); }
+.fill-mid { background:var(--warm); }
+.fill-high { background:var(--accent); }
+
+.interp-section { padding:28px 0; border-bottom:1px solid var(--border); }
+.interp-card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:24px; margin-bottom:16px; }
+.interp-card h4 { font-family:'Noto Serif SC',serif; font-size:15px; font-weight:700; color:var(--text-dark); margin-bottom:10px; }
+.interp-card p { font-size:14px; line-height:1.9; color:var(--text-body); }
+
+.result-disclaimer { padding:24px 0; border-bottom:1px solid var(--border); }
+.result-disclaimer .disc-box { font-size:12px; line-height:1.8; color:var(--text-muted); padding:16px; border-left:2px solid var(--accent); background:var(--accent-light); border-radius:0 6px 6px 0; }
+.result-actions { padding:28px 0 48px; display:flex; flex-direction:column; gap:12px; align-items:center; }
+.share-line { font-size:12px; color:var(--text-muted); opacity:0.7; }
+.btn-outline { display:inline-block; background:transparent; border:1.5px solid var(--border); color:var(--text-body); border-radius:8px; padding:12px 36px; font-size:14px; cursor:pointer; transition:all 0.3s; font-family:'Noto Sans SC'; }
+.btn-outline:hover { border-color:var(--text-dark); color:var(--text-dark); }
+.watermark { text-align:center; padding-bottom:32px; font-size:11px; color:var(--text-muted); opacity:0.4; letter-spacing:1px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- INTRO -->
+  <div class="screen active" id="intro">
+    <div class="intro-header">
+      <div class="edition">Intimate Relationship Assessment · 2026</div>
+      <h1>你的伴侣<br>有NPD倾向吗</h1>
+      <div class="en-title">Narcissistic Personality Tendency Scale — Partner Edition</div>
+    </div>
+    <div class="intro-body">
+      <div class="ref-tag">参考框架：DSM-5 诊断标准</div>
+      <p class="desc">本测评基于DSM-5自恋型人格障碍的9项核心诊断标准，专门针对亲密关系场景设计。27道题，从日常相处到深层动机逐步递进，帮你看清那些"说不清的不对劲"背后可能存在的人格模式。</p>
+
+      <div class="methodology">
+        <h3>测 评 维 度</h3>
+        <div class="dimension-grid">
+          <div class="dim-chip">自我膨胀</div><div class="dim-chip">成功幻想</div><div class="dim-chip">优越意识</div>
+          <div class="dim-chip">认可饥渴</div><div class="dim-chip">规则豁免</div><div class="dim-chip">关系工具化</div>
+          <div class="dim-chip">情感隔离</div><div class="dim-chip">暗中较量</div><div class="dim-chip">居高临下</div>
+        </div>
+      </div>
+
+      <div class="how-section">
+        <h3>如何作答</h3>
+        <p>请回忆你和TA相处的真实经历，根据TA的实际表现打分。不需要每道题都有明确答案——凭你的直觉和感受作答即可。1分代表完全不符合，5分代表完全符合。</p>
+      </div>
+
+      <div class="disclaimer">⚠️ 本测评仅为心理学科普与自我认知工具，不构成任何临床诊断。NPD的确诊需由持证精神科医师或临床心理师通过系统评估做出。如您正处于一段令您痛苦的关系中，请寻求专业帮助。</div>
+      <button class="btn-primary" onclick="startQuiz()">开始测评 · 约4分钟</button>
+    </div>
+    <div class="intro-footer">仅供自我认知参考 · 非临床诊断工具</div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quiz">
+    <div class="quiz-top">
+      <div class="quiz-progress-row">
+        <span class="qcount" id="qCount">01 / 27</span>
+        <span class="layer-label" id="layerLabel">日常行为</span>
+      </div>
+      <div class="quiz-bar"><div class="quiz-bar-fill" id="quizBarFill" style="width:0%"></div></div>
+    </div>
+    <div class="quiz-question"><h2 id="quizText"></h2></div>
+    <div class="likert-wrap">
+      <div class="likert-labels"><span>完全不符合</span><span>完全符合</span></div>
+      <div class="likert-options" id="likertOptions"></div>
+      <div class="likert-hint"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="result">
+    <div class="result-header">
+      <div class="r-label">Assessment Result</div>
+      <div class="score-display"><span class="score-big" id="totalScore">0</span><span class="score-total"> / 135</span></div>
+      <div id="levelBadge" class="score-level level-low">正常范围</div>
+    </div>
+    <div class="verdict-section"><div class="verdict-text" id="verdictText"></div></div>
+    <div class="radar-section">
+      <div class="section-title">维度分布</div>
+      <div class="radar-canvas-wrap"><canvas id="radarCanvas" width="340" height="340"></canvas></div>
+    </div>
+    <div class="dim-section">
+      <div class="section-title">各维度得分</div>
+      <div id="dimBreakdown"></div>
+    </div>
+    <div class="interp-section">
+      <div class="section-title">结果解读</div>
+      <div id="interpContent"></div>
+    </div>
+    <div class="result-disclaimer"><div class="disc-box">⚠️ 本结果仅反映你对伴侣行为模式的主观感知，不代表临床诊断。自恋特质在一定范围内属于正常人格变异，只有当特质显著且持续地损害关系功能时，才可能构成人格障碍。如有疑虑，请咨询专业心理健康人士。</div></div>
+    <div class="result-actions">
+      <div class="share-line">📸 截图分享 · 让朋友也来测一测</div>
+      <button class="btn-outline" onclick="restart()">↻ 重新测评</button>
+    </div>
+    <div class="watermark">亲密关系NPD倾向测评 · Partner NPTS</div>
+  </div>
+</div>
+
+<script>
+const dims = [
+  { key:'grandiosity',  name:'自我膨胀',   sub:'夸大自身重要性，永远觉得自己是对的' },
+  { key:'fantasy',      name:'成功幻想',   sub:'沉浸于理想化叙事，回避现实' },
+  { key:'specialness',  name:'优越意识',   sub:'认为自己高人一等，伴侣是"幸运的"' },
+  { key:'admiration',   name:'认可饥渴',   sub:'持续索取关注、赞美与情绪价值' },
+  { key:'entitlement',  name:'规则豁免',   sub:'双重标准，只许自己不许别人' },
+  { key:'exploitation', name:'关系工具化', sub:'温柔是手段，爱是交易' },
+  { key:'empathy_lack', name:'情感隔离',   sub:'在你最需要的时候缺席' },
+  { key:'envy',         name:'暗中较量',   sub:'无法接受你比TA好' },
+  { key:'arrogance',    name:'居高临下',   sub:'教育你、纠正你、贬低你' }
+];
+
+// 27 questions: 9 dims × 3 layers
+const questions = [
+  // ========== LAYER 1: 日常相处 ==========
+  {dim:0, layer:1, t:'你们意见不一致时，TA是否很少真正考虑你的观点，而是默认自己是对的'},
+  {dim:1, layer:1, t:'TA是否经常描绘你们未来的宏大蓝图，但几乎从不落实到具体行动'},
+  {dim:2, layer:1, t:'TA是否说过或暗示过你能和TA在一起是一种幸运'},
+  {dim:3, layer:1, t:'TA是否需要你频繁地夸赞TA、肯定TA，否则就变得不高兴'},
+  {dim:4, layer:1, t:'TA对你有很多要求和标准，但同样的规则TA自己从来不遵守'},
+  {dim:5, layer:1, t:'TA对你格外体贴的时候，是否往往是需要你帮忙或配合的前奏'},
+  {dim:6, layer:1, t:'当你心情低落想找TA倾诉时，TA是否经常敷衍、不耐烦或转移话题'},
+  {dim:7, layer:1, t:'当你在工作或社交上有好消息时，TA的反应更像是不安而不是替你高兴'},
+  {dim:8, layer:1, t:'TA跟你说话时是否经常带着一种"教你做人"的语气'},
+
+  // ========== LAYER 2: 关系模式 ==========
+  {dim:0, layer:2, t:'吵架之后，TA是否从不真正道歉，反而让你觉得一切都是你的问题'},
+  {dim:1, layer:2, t:'你是否感觉TA爱的不是真实的你，而是TA脑中理想伴侣的投影'},
+  {dim:2, layer:2, t:'TA是否评价过你的朋友或家人"层次不够"，暗示他们配不上你们的圈子'},
+  {dim:3, layer:2, t:'如果你有一段时间没给TA正面反馈或夸奖，TA是否会变得冷淡、质问你或制造冲突'},
+  {dim:4, layer:2, t:'TA翻你手机觉得理所当然，但你碰TA手机就是"不信任"'},
+  {dim:5, layer:2, t:'回顾你们的相处，TA的温柔和主动是否总出现在TA有所求的时候'},
+  {dim:6, layer:2, t:'在你最脆弱的时刻——生病、失业、家人出事——TA是否反而变得疏远或不耐烦'},
+  {dim:7, layer:2, t:'TA是否会贬低你的前任或其他追求者，同时暗示自己是你能找到的最好选择'},
+  {dim:8, layer:2, t:'TA是否会当着别人的面纠正你、替你回答、或用"开玩笑"的方式贬低你'},
+
+  // ========== LAYER 3: 深层感受 ==========
+  {dim:0, layer:3, t:'和TA在一起之后，你是否越来越觉得自己不够好、不够聪明、做什么都不对'},
+  {dim:1, layer:3, t:'TA不如意时是否总把责任推给命运不公或他人阻碍，从来不反思自己的问题'},
+  {dim:2, layer:3, t:'你是否感觉到TA在潜意识里觉得你配不上TA，跟你在一起是在"降维"'},
+  {dim:3, layer:3, t:'当TA得不到你全部的注意力——比如你在忙工作或陪朋友——TA是否会制造矛盾把你拉回来'},
+  {dim:4, layer:3, t:'在这段关系里，你是否总觉得自己是亏欠TA的那个人'},
+  {dim:5, layer:3, t:'你是否发现TA表演给你的关心，在有外人看的时候会明显加倍'},
+  {dim:6, layer:3, t:'在你最需要被安慰的瞬间，你是否感到TA真正担心的不是你，而是这件事会不会给TA添麻烦'},
+  {dim:7, layer:3, t:'TA是否曾在你获得重要成就的当天，用某种方式破坏了你的心情'},
+  {dim:8, layer:3, t:'在这段关系里，你是否逐渐失去了自己的声音，变成了那个总在迎合、总在道歉的人'}
+];
+
+let currentQ = 0;
+let answers = new Array(27).fill(0);
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startQuiz() {
+  currentQ=0; answers=new Array(27).fill(0);
+  showScreen('quiz'); renderQ();
+}
+
+function getLayerInfo(l) {
+  if(l===1) return {text:'日常相处',cls:'layer-1'};
+  if(l===2) return {text:'关系模式',cls:'layer-2'};
+  return {text:'深层感受',cls:'layer-3'};
+}
+
+function renderQ() {
+  const q=questions[currentQ], n=currentQ+1;
+  document.getElementById('qCount').textContent=String(n).padStart(2,'0')+' / 27';
+  const li=getLayerInfo(q.layer);
+  const label=document.getElementById('layerLabel');
+  label.textContent=li.text; label.className='layer-label '+li.cls;
+  document.getElementById('quizBarFill').style.width=(n/27*100)+'%';
+  document.getElementById('quizText').textContent=q.t;
+  const wrap=document.getElementById('likertOptions'); wrap.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const btn=document.createElement('button');
+    btn.className='likert-btn'; btn.textContent=i;
+    btn.onclick=()=>selectLikert(i); wrap.appendChild(btn);
+  }
+  const qEl=document.querySelector('.quiz-question');
+  qEl.style.animation='none'; qEl.offsetHeight; qEl.style.animation='fadeIn 0.35s ease';
+}
+
+function selectLikert(val) {
+  answers[currentQ]=val;
+  document.querySelectorAll('.likert-btn').forEach((b,i)=>b.classList.toggle('selected',i===val-1));
+  setTimeout(()=>{ currentQ++; if(currentQ<questions.length) renderQ(); else showResult(); },280);
+}
+
+function showResult() {
+  showScreen('result');
+
+  const dimScores=dims.map((d,i)=>{
+    const qs=questions.map((q,qi)=>q.dim===i?qi:-1).filter(x=>x>=0);
+    const sum=qs.reduce((a,qi)=>a+answers[qi],0);
+    return {...d, score:sum, max:15, pct:Math.round(sum/15*100)};
+  });
+  const total=dimScores.reduce((a,d)=>a+d.score,0);
+
+  // Animate
+  const totalEl=document.getElementById('totalScore');
+  let cnt=0; const step=Math.max(1,Math.floor(total/30));
+  const timer=setInterval(()=>{cnt+=step;if(cnt>=total){cnt=total;clearInterval(timer);}totalEl.textContent=cnt;},35);
+
+  // Thresholds for paying users who already have a target in mind:
+  // ≤59 (avg ≤2.2): few patterns → normal
+  // 60-89 (avg 2.2-3.3): some patterns → mild
+  // 90-107 (avg 3.3-4.0): clear repeated patterns → moderate
+  // 108+ (avg 4.0+): pervasive → high
+  const badge=document.getElementById('levelBadge');
+  let levelKey='';
+  if(total<=59){badge.textContent='正常范围';badge.className='score-level level-low';levelKey='low';}
+  else if(total<=89){badge.textContent='轻度倾向';badge.className='score-level level-mid';levelKey='mid';}
+  else if(total<=107){badge.textContent='中度倾向';badge.className='score-level level-high';levelKey='high';}
+  else{badge.textContent='高度倾向';badge.className='score-level level-extreme';levelKey='extreme';}
+
+  // Verdict
+  const verdicts = {
+    low:'基于你的描述，TA的自恋特质处于正常水平。你们关系中的不适可能来源于沟通方式或其他因素，而非人格层面的问题。',
+    mid:'TA表现出一定的自恋倾向。你在这段关系中感受到的那些"说不清的不对劲"，可能不是你太敏感——而是一种真实的关系失衡正在发生。',
+    high:'TA在多个维度上表现出显著的自恋人格倾向。如果你在这段关系中长期感到被消耗、被否定、或正在失去自我，这不是你的错。',
+    extreme:'TA表现出高度自恋人格倾向。请认真评估这段关系对你心理健康的影响，必要时寻求专业支持。你值得被好好对待。'
+  };
+  document.getElementById('verdictText').textContent=verdicts[levelKey];
+
+  // Radar
+  setTimeout(()=>drawRadar(dimScores),300);
+
+  // Breakdown
+  const sorted=[...dimScores].sort((a,b)=>b.score-a.score);
+  const bd=document.getElementById('dimBreakdown'); bd.innerHTML='';
+  sorted.forEach((d,i)=>{
+    const fc=d.pct<=40?'fill-low':d.pct<=66?'fill-mid':'fill-high';
+    const sc=d.pct>66?'var(--accent)':d.pct>40?'var(--warm)':'var(--clinical)';
+    const row=document.createElement('div'); row.className='dim-row';
+    row.innerHTML=`<div class="dim-rank">${String(i+1).padStart(2,'0')}</div><div class="dim-info"><div class="dim-name">${d.name}</div><div class="dim-sub">${d.sub}</div></div><div class="dim-score" style="color:${sc}">${d.score}</div><div class="dim-bar-wrap"><div class="dim-bar-bg"><div class="dim-bar-fill ${fc}" id="dbar${i}" style="width:0%"></div></div></div>`;
+    bd.appendChild(row);
+    setTimeout(()=>{document.getElementById('dbar'+i).style.width=d.pct+'%';},500+i*120);
+  });
+
+  // Interpretation
+  const interp=document.getElementById('interpContent'); interp.innerHTML='';
+
+  const overallTexts = {
+    low:'基于你的描述，TA在亲密关系中的自恋特质处于正常水平。关系中的摩擦可能需要从沟通模式、依恋风格或双方的期望差异等角度去理解，不一定是人格层面的问题。',
+    mid:'TA在亲密关系中表现出一定的自恋倾向。那些让你觉得"我的感受总是不被重视"的时刻，可能不是你太矫情——而是TA确实在关系中把自己的需求置于你的之上。建议留意这种模式是否在加剧。',
+    high:'TA在亲密关系中表现出显著的自恋人格倾向。如果你长期感到情感被消耗、需求被忽视、自我价值被否定，这份结果或许印证了你的感受——你的直觉是对的。建议与信任的朋友或专业人士谈谈你的处境。',
+    extreme:'TA在亲密关系中表现出高度自恋人格倾向。请严肃评估这段关系对你心理健康的实际影响。如果你正处于持续的情感消耗中，如果你已经开始怀疑自己的判断力和价值，请记住：这不是你不够好，是这段关系的结构性问题。强烈建议寻求专业心理支持。'
+  };
+
+  const oc=document.createElement('div'); oc.className='interp-card';
+  oc.innerHTML=`<h4>总体评估</h4><p>${overallTexts[levelKey]}</p>`;
+  interp.appendChild(oc);
+
+  // Top dims — each gets its own dedicated insight
+  const dimInsights = {
+    '自我膨胀': '「自我膨胀」得分突出，说明TA在关系中习惯性地占据"正确"的位置。你可能已经发现，争吵的结局永远是你在道歉——不是因为你真的错了，而是因为TA从不认为自己有错。长期下来，你会开始怀疑自己的判断力。',
+    '成功幻想': '「成功幻想」得分突出，说明TA可能擅长用宏大的承诺和愿景来维系关系，却很少用行动兑现。你可能曾经被TA描绘的未来深深吸引，但越来越发现那些蓝图永远停留在嘴上。TA需要你相信那个"未来的TA"，好让你愿意忍受"现在的TA"。',
+    '优越意识': '「优越意识」得分突出，说明TA在潜意识里可能把你们的关系看作一种不对等的存在——TA是施恩的一方，你是被选中的那个。这种优越感可能很隐蔽，但它会体现在TA评价你的朋友、你的选择、甚至你的价值的方式里。',
+    '认可饥渴': '「认可饥渴」得分突出，说明你在关系中承担了大量隐性的情绪劳动——持续输出赞美、肯定和关注来满足TA的需求。你可能已经注意到，TA的情绪状态高度依赖于你是否在"看着TA"，而你的感受反而从未被同等重视。',
+    '规则豁免': '「规则豁免」得分突出，说明你们的关系中存在明显的双重标准。TA可以做的事你不能做，TA要求你遵守的规则TA自己不遵守。你可能经常觉得"这不公平"，但每次提出来都会被TA用各种方式绕回去。',
+    '关系工具化': '「关系工具化」得分突出，说明TA的温柔可能更像一种策略而非真心——它在需要你的时候出现，在不需要时消失。回想一下TA对你最好的那些时刻，是不是往往紧跟着一个请求或一次索取。',
+    '情感隔离': '「情感隔离」得分突出，说明在你最需要被支撑的时刻——生病、低落、遭遇挫折——TA反复缺席或表现出不耐烦。这种模式会严重侵蚀你的安全感，让你学会不再向TA敞开心扉，甚至觉得"有情绪是我的问题"。',
+    '暗中较量': '「暗中较量」得分突出，说明TA无法真正为你的成功感到高兴。你的升职、你的好消息、你被别人夸奖——这些对TA而言不是值得庆祝的事，而是一种隐性的威胁。你可能已经学会了在TA面前收敛自己的光芒。',
+    '居高临下': '「居高临下」得分突出，说明TA在关系中持续建立一种不平等的权力结构——通过纠正你、教育你、当众贬低你来维持自己的优越感。你可能已经很久没有在TA面前自信地表达过自己的想法了。'
+  };
+
+  const highDims = sorted.filter(d=>d.pct>40);
+  if(highDims.length>0){
+    // Show top 1 dim with full dedicated insight
+    const topDim = highDims[0];
+    const insight1 = dimInsights[topDim.name] || '';
+    const tc1=document.createElement('div'); tc1.className='interp-card';
+    tc1.innerHTML=`<h4>最突出的维度</h4><p>${insight1}</p>`;
+    interp.appendChild(tc1);
+
+    // If there's a 2nd high dim, show it too
+    if(highDims.length>=2){
+      const dim2 = highDims[1];
+      const insight2 = dimInsights[dim2.name] || '';
+      const tc2=document.createElement('div'); tc2.className='interp-card';
+      tc2.innerHTML=`<h4>第二突出的维度</h4><p>${insight2}</p>`;
+      interp.appendChild(tc2);
+    }
+  }
+
+  // Layer-specific insight
+  const l1avg = answers.slice(0,9).reduce((a,b)=>a+b,0) / 9;
+  const l3avg = answers.slice(18,27).reduce((a,b)=>a+b,0) / 9;
+
+  if(l3avg > l1avg + 0.5 && l3avg >= 3.2) {
+    const dc=document.createElement('div'); dc.className='interp-card';
+    dc.innerHTML=`<h4>值得注意</h4><p>你在"深层感受"部分的得分明显高于"日常相处"部分。这可能意味着TA的自恋行为在日常中不易察觉，但已经对你的自我认知和情感健康产生了深层影响。表面上看起来"还好"的关系，不代表你内心真的还好。</p>`;
+    interp.appendChild(dc);
+  }
+}
+
+function drawRadar(dimScores) {
+  const canvas=document.getElementById('radarCanvas');
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=340*dpr; canvas.height=340*dpr;
+  canvas.style.width='340px'; canvas.style.height='340px';
+  ctx.scale(dpr,dpr);
+  const cx=170,cy=170,r=120,n=9;
+  for(let ring=1;ring<=5;ring++){
+    const rr=r*ring/5; ctx.beginPath();
+    for(let i=0;i<n;i++){const a=(Math.PI*2*i/n)-Math.PI/2;const x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.closePath();ctx.strokeStyle='#e2ddd6';ctx.lineWidth=0.8;ctx.stroke();
+  }
+  for(let i=0;i<n;i++){
+    const a=(Math.PI*2*i/n)-Math.PI/2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));
+    ctx.strokeStyle='#e2ddd6';ctx.lineWidth=0.5;ctx.stroke();
+    const lx=cx+(r+22)*Math.cos(a),ly=cy+(r+22)*Math.sin(a);
+    ctx.fillStyle='#8a8580';ctx.font='11px Noto Sans SC';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(dims[i].name,lx,ly);
+  }
+  ctx.beginPath();
+  for(let i=0;i<n;i++){const a=(Math.PI*2*i/n)-Math.PI/2;const v=dimScores[i].score/15;const x=cx+r*v*Math.cos(a),y=cy+r*v*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+  ctx.closePath();ctx.fillStyle='rgba(194,60,42,0.12)';ctx.fill();ctx.strokeStyle='#c23c2a';ctx.lineWidth=2;ctx.stroke();
+  for(let i=0;i<n;i++){
+    const a=(Math.PI*2*i/n)-Math.PI/2;const v=dimScores[i].score/15;
+    const x=cx+r*v*Math.cos(a),y=cy+r*v*Math.sin(a);
+    ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fillStyle='#c23c2a';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+  }
+}
+
+function restart(){showScreen('intro');}
+</script>
+</body>
+</html>
